@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TupperTransformer Demo</title>
+    <title>TupperTransformer Demo (v5)</title>
     <!-- Load Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,8 +13,10 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
             width: 100%;
-            aspect-ratio: 106 / 17;
+            aspect-ratio: 1060 / 170; /* Use the new native resolution */
             background-color: #f0f0f0;
+            /* Add a border to the canvas itself */
+            border: 1px solid #ccc;
         }
         /* Style canvas when draw mode is active */
         canvas.draw-mode-active {
@@ -47,18 +49,14 @@
             @apply text-white;
         }
         /* Specific active colors for each tab */
-        #btnAnimTab[aria-selected="true"] {
-            @apply bg-blue-600;
+        #btnTransformTab[aria-selected="true"] {
+            @apply bg-indigo-600;
         }
-        #btnTetrisTab[aria-selected="true"] {
-            @apply bg-orange-500;
-        }
-        /* NEW: Draw tab color */
-        #btnDrawTab[aria-selected="true"] {
+         #btnDrawTab[aria-selected="true"] {
             @apply bg-green-600;
         }
-        #btnManualTab[aria-selected="true"] {
-            @apply bg-indigo-600;
+        #btnExamplesTab[aria-selected="true"] {
+            @apply bg-blue-600;
         }
         /* Add user-select-none to prevent text highlighting when rapidly clicking/holding buttons */
         .manual-anim-button {
@@ -79,9 +77,8 @@
         </a>
         
         <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">TupperTransformer</h1>
-        <!-- UPDATED: Added your name -->
         <p class="text-center text-gray-600 mb-6">
-            An interactive demo by Prathamesh Deshmukh, based on his 2018 paper.
+            An interactive demo of my transformation algorithm -Prathamesh Deshmukh.
         </p>
 
         <!-- "Read More" Button -->
@@ -90,7 +87,7 @@
         </div>
 
         <div class="bg-gray-200 rounded-lg p-2 overflow-hidden">
-            <canvas id="tupperCanvas" width="106" height="17"></canvas>
+            <canvas id="tupperCanvas" width="1060" height="170"></canvas>
         </div>
 
         <!-- K-Value Input -->
@@ -99,52 +96,26 @@
             <textarea id="k_value" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 font-mono text-xs"></textarea>
         </div>
 
+        <!-- Instructions -->
+        <div class="mt-6 mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <p class="text-gray-700 font-medium">Select a mode below to start.</p>
+            <p class="text-sm text-gray-600">You can transform examples, draw your own, or watch the animated demos from the paper.</p>
+        </div>
+
         <!-- Tabbed Control Interface -->
         <div class="mt-6">
-            <!-- UPDATED: Tab Buttons (4 cols) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" role="tablist">
-                <button id="btnAnimTab" role="tab" aria-selected="true" class="tab-button">Animation (Eg3.1)</button>
-                <button id="btnTetrisTab" role="tab" aria-selected="false" class="tab-button">Interactive Tetris (Eg3.2)</button>
+            <!-- Tab Buttons -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4" role="tablist">
+                <button id="btnTransformTab" role="tab" aria-selected="true" class="tab-button">Transform & Load</button>
                 <button id="btnDrawTab" role="tab" aria-selected="false" class="tab-button">Draw</button>
-                <button id="btnManualTab" role="tab" aria-selected="false" class="tab-button">Manual Editor</button>
+                <button id="btnExamplesTab" role="tab" aria-selected="false" class="tab-button">Demos & Examples</button>
             </div>
 
             <!-- Tab Panels -->
             <div class="mt-4">
 
-                <!-- Panel 1: Animation (Eg3.1) -->
-                <div id="animationPanel" role="tabpanel">
-                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg text-center">
-                         <h3 class="text-lg font-semibold text-blue-800 mb-4">UFO Animation</h3>
-                         <p class="text-blue-700 mb-4 text-sm">Playing animation from Eg3.1. Press Stop to edit.</p>
-                         <button id="btnStopAnim" class="w-full md:w-1/2 bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600 transition-colors shadow-sm">Stop Animation</button>
-                    </div>
-                </div>
-
-                <!-- Panel 2: Interactive Tetris (Eg3.2) -->
-                <div id="tetrisPanel" role="tabpanel" class="hidden">
-                    <div class="p-4 border border-orange-200 bg-orange-50 rounded-lg">
-                         <h3 class="text-lg font-semibold text-orange-800 mb-4 text-center">Interactive Tetris Controls (Eg3.2)</h3>
-                         <p class="text-orange-700 mb-4 text-sm text-center">Use these buttons to transform the L-piece (ks) independently from the resting pieces (kr).</p>
-                         <div class="grid grid-cols-3 gap-3 mt-4 max-w-md mx-auto">
-                            <button id="btnTetrisMoveLeft" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Left</button>
-                            <button id="btnTetrisMoveDown" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Down</button>
-                            <button id="btnTetrisMoveRight" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Right</button>
-                         </div>
-                    </div>
-                </div>
-
-                <!-- NEW: Panel 3: Draw -->
-                <div id="drawPanel" role="tabpanel" class="hidden">
-                    <div class="p-4 border border-green-200 bg-green-50 rounded-lg text-center">
-                         <h3 class="text-lg font-semibold text-green-800 mb-4">Draw Mode</h3>
-                         <p class="text-green-700 mb-4 text-sm">Click or drag on the canvas to toggle pixels. The K-Value will update in real-time.</p>
-                         <button id="btnClearCanvas" class="w-full md:w-1/2 bg-gray-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors shadow-sm">Clear Canvas</button>
-                    </div>
-                </div>
-                
-                <!-- Panel 4: Manual Editor -->
-                <div id="manualPanel" role="tabpanel" class="hidden">
+                <!-- Panel 1: Transform & Load (Manual Editor) -->
+                <div id="transformPanel" role="tabpanel">
                     <div class="p-4 border border-gray-200 bg-gray-50 rounded-lg">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Load Static Example</h3>
                         <div class="grid grid-cols-2 gap-3">
@@ -168,6 +139,40 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Panel 2: Draw -->
+                <div id="drawPanel" role="tabpanel" class="hidden">
+                    <div class="p-4 border border-green-200 bg-green-50 rounded-lg text-center">
+                         <h3 class="text-lg font-semibold text-green-800 mb-4">Draw Mode</h3>
+                         <p class="text-green-700 mb-4 text-sm">Click or drag on the canvas to toggle pixels. The K-Value will update in real-time.</p>
+                         <button id="btnClearCanvas" class="w-full md:w-1/2 bg-gray-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-600 transition-colors shadow-sm">Clear Canvas</button>
+                    </div>
+                </div>
+                
+                <!-- Panel 3: Demos & Examples -->
+                <div id="examplesPanel" role="tabpanel" class="hidden">
+                    <!-- Demo 1: Animation -->
+                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg text-center mb-6">
+                         <h3 class="text-lg font-semibold text-blue-800 mb-4">Animation Demo (Eg3.1)</h3>
+                         <p class="text-blue-700 mb-4 text-sm">Plays the "Top-Left UFO" animation from the paper.</p>
+                         <button id="btnToggleUFOAnim" class="w-full md:w-1/2 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors shadow-sm">Play UFO Animation</button>
+                    </div>
+                    
+                    <!-- Demo 2: Interactive Tetris -->
+                    <div class="p-4 border border-orange-200 bg-orange-50 rounded-lg">
+                         <h3 class="text-lg font-semibold text-orange-800 mb-4 text-center">Interactive Tetris (Eg3.2)</h3>
+                         <div class="text-center mb-4">
+                             <button id="btnLoadTetris" class="w-full md:w-1/2 bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors shadow-sm">Load Tetris Example</button>
+                         </div>
+                         <p class="text-orange-700 mb-4 text-sm text-center">After loading, use these buttons to transform the L-piece (ks) independently from the resting pieces (kr).</p>
+                         <div class="grid grid-cols-3 gap-3 mt-4 max-w-md mx-auto">
+                            <button id="btnTetrisMoveLeft" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Left</button>
+                            <button id="btnTetrisMoveDown" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Down</button>
+                            <button id="btnTetrisMoveRight" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Right</button>
+                         </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -194,36 +199,41 @@
             <p class="text-gray-700 mb-4">
                 The technical paper that this project implements is my 2018 preprint, which provides the complete mathematical foundation for these operations.
             </p>
-            <ul class="list-none mb-4 space-y-2">
+            <ul class="list-none mb-4 space-y-2 bg-gray-50 p-4 rounded-md border">
                 <li><strong class="text-gray-800">Paper:</strong> "Transformation of the pixels in Tupper's self-referential formula"</li>
                 <li><strong class="text-gray-800">Author:</strong> Prathamesh Deshmukh (Me)</li>
                 <li><strong class="text-gray-800">Publication Date:</strong> May 24, 2018</li>
             </ul>
 
+            <!-- UPDATED SECTION START -->
             <p class="text-gray-700 mb-4">
                 The core idea I explored in the paper is that any graphical formation plotted by Tupper's formula (in the $106 \times 17$ grid) can be transformed by applying arithmetic operations directly to the `k` constant.
             </p>
             <p class="text-gray-700 mb-4">This algorithm allows for precise transformations, including:</p>
-            <ul class="list-disc list-inside space-y-3 mb-4 text-gray-700">
-                <li><strong class="text-gray-800">Pixel Manipulation:</strong> Adding or removing any individual pixel `i` by adding or subtracting the value $17 \times 2^{i-1}$ from the `k` constant. (Equation C)</li>
+            
+            <ul class="list-none space-y-4 mb-4 text-gray-700">
                 <li>
-                    <strong class="text-gray-800">Spatial Translation (Moving):</strong>
+                    <strong class="text-gray-800 block">Pixel Manipulation:</strong>
+                    Adding or removing any individual pixel `i` by adding or subtracting the value $17 \times 2^{i-1}$ from the `k` constant. (Equation C)
+                </li>
+                <li>
+                    <strong class="text-gray-800 block">Spatial Translation (Moving):</strong>
                     <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
                         <li><strong>Up/Down:</strong> Moving the entire image `n` pixels up or down by multiplying or dividing `k` by $2^n$.</li>
                         <li><strong>Left/Right:</strong> Moving the entire image `n` pixels left or right by multiplying or dividing `k` by $2^{n \times 17}$.</li>
                     </ul>
                 </li>
-                <li><strong class="text-gray-800">Animation (Framing):</strong> I also showed how these transformations can be applied sequentially to create a "film" or "motion picture" by treating each new `k` value as a frame. (Equation D)</li>
-                <li><strong class="text-gray-800">Complex Transformations:</strong> The algorithm can also be used to apply different transformations to different pixels at the same time or to create diagonal movements.</li>
             </ul>
+            <!-- UPDATED SECTION END -->
+
             
             <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">How to Use This Demo</h3>
             <ol class="list-decimal list-inside space-y-2 text-gray-700">
-                <li>Select a mode: Animation, Interactive Tetris, or Manual Editor.</li>
-                <li>The demo will load the relevant example from my paper.</li>
+                <li>Select a mode: Transform & Load, Draw, or Demos & Examples.</li>
+                <li>The demo will load the relevant example from my paper or a blank canvas.</li>
                 <li>Use the contextual controls for each mode to transform the image.</li>
                 <li>See the resulting `k` value and the updated image in real-time.</li>
-            </ol>
+            </Ssol>
 
             <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">Citation & Publication History</h3>
             
@@ -284,31 +294,28 @@
             const btnCloseModal = document.getElementById('btnCloseModal');
 
             // --- Tab Buttons ---
-            const btnAnimTab = document.getElementById('btnAnimTab');
-            const btnTetrisTab = document.getElementById('btnTetrisTab');
-            const btnDrawTab = document.getElementById('btnDrawTab'); // NEW
-            const btnManualTab = document.getElementById('btnManualTab');
-            const tabs = [btnAnimTab, btnTetrisTab, btnDrawTab, btnManualTab];
+            const btnTransformTab = document.getElementById('btnTransformTab');
+            const btnDrawTab = document.getElementById('btnDrawTab');
+            const btnExamplesTab = document.getElementById('btnExamplesTab');
+            const tabs = [btnTransformTab, btnDrawTab, btnExamplesTab];
 
             // --- Tab Panels ---
-            const animationPanel = document.getElementById('animationPanel');
-            const tetrisPanel = document.getElementById('tetrisPanel');
-            const drawPanel = document.getElementById('drawPanel'); // NEW
-            const manualPanel = document.getElementById('manualPanel');
-            const panels = [animationPanel, tetrisPanel, drawPanel, manualPanel];
+            const transformPanel = document.getElementById('transformPanel');
+            const drawPanel = document.getElementById('drawPanel');
+            const examplesPanel = document.getElementById('examplesPanel');
+            const panels = [transformPanel, drawPanel, examplesPanel];
 
-            // --- Mode: Animation ---
-            const btnStopAnim = document.getElementById('btnStopAnim');
-            
-            // --- Mode: Tetris ---
+            // --- Mode: Examples ---
+            const btnToggleUFOAnim = document.getElementById('btnToggleUFOAnim');
+            const btnLoadTetris = document.getElementById('btnLoadTetris');
             const btnTetrisMoveLeft = document.getElementById('btnTetrisMoveLeft');
             const btnTetrisMoveRight = document.getElementById('btnTetrisMoveRight');
             const btnTetrisMoveDown = document.getElementById('btnTetrisMoveDown');
-
+            
             // --- Mode: Draw ---
-            const btnClearCanvas = document.getElementById('btnClearCanvas'); // NEW
+            const btnClearCanvas = document.getElementById('btnClearCanvas'); 
 
-            // --- Mode: Static / Manual ---
+            // --- Mode: Transform & Load ---
             const btnLoadTupper = document.getElementById('btnLoadTupper');
             const btnLoadUFOCenter = document.getElementById('btnLoadUFOCenter'); 
             
@@ -320,15 +327,17 @@
             const manualAnimButtons = [btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnMoveDiagUpRight];
             
             const btnStopManualAnim = document.getElementById('btnStopManualAnim');
-
+            
             // --- Constants from your paper ---
             const GRID_WIDTH = 106;
             const GRID_HEIGHT = 17;
+            const PIXEL_SCALE = 10;
             const H_BIGINT = BigInt(GRID_HEIGHT); // 17n
             const OFF_PIXEL_COLOR = '#f0f0f0';
             const ON_PIXEL_COLOR = '#000000';
-            const ANIMATION_SPEED = 150; // ms for manual hold animation
-            const LATCH_TIME = 1000; // 1 second hold to latch
+            const GRID_COLOR = '#ccc'; 
+            const ANIMATION_SPEED = 150; 
+            const LATCH_TIME = 1000; 
             
             const TUPPER_K = 960939379918958884971672962127852754715004339660129306651505519271702802395266424689642842174350718121267153782770623355993237280874144307891325963941337723487857735749823926629715517173716995165232890538221612403238855866184013235585136048828693337902491454229288667081096184496091705183454067827731551705405381627380967602565625016981482083418783163849115590225610003652351370343874461848378737238198224849863465033159410054974700593138339226497249461751545728366702369745461014655997933798537483143786841806593422227898388722980000748404719n;
             const UFO_CENTER_K = 443352924415299750269935582831006891736908292088519263818614474851967119874782775886465719557549939463756309785941884807127269950858601139076519485343718480093603142421094905794300356122213456551693296459008206217500505569300664030340014779960166914732789553875507120518890769928117177323414356728568578317831865211788253557426913017856n;
@@ -340,15 +349,15 @@
 
             // --- State Variables ---
             let ufoAnimationInterval = null;
-            let manualAnimationInterval = null; // For the 'hold' interval
-            let manualAnimationTimer = null; // For the 'latch' timeout
-            let isManualAnimationLatched = false; // Latch flag
-            let currentTetrisPieceK = 0n; // Holds the transformed 'ks'
+            let manualAnimationInterval = null; 
+            let manualAnimationTimer = null; 
+            let isManualAnimationLatched = false; 
+            let currentTetrisPieceK = 0n; 
 
             // --- Draw Mode State ---
             let isDrawing = false;
-            let drawnPixels = new Set(); // Prevents toggling the same pixel multiple times in one drag
-            let currentK = 0n; // Local cache of k for drawing
+            let drawnPixels = new Set(); 
+            let currentK = 0n; 
 
             /**
              * Core Drawing Function
@@ -358,18 +367,29 @@
                     console.error("drawGrid requires a BigInt");
                     return;
                 }
-                currentK = k; // Update the local cache
+                currentK = k; 
                 ctx.fillStyle = OFF_PIXEL_COLOR;
-                ctx.fillRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
-                ctx.fillStyle = ON_PIXEL_COLOR;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
                 const k_div_17 = k / H_BIGINT;
+
+                ctx.strokeStyle = GRID_COLOR;
+                ctx.lineWidth = 1;
+
                 for (let x = 0; x < GRID_WIDTH; x++) {
                     for (let y = 0; y < GRID_HEIGHT; y++) {
                         const bit_position = BigInt(x * GRID_HEIGHT + y);
                         const bit = (k_div_17 >> bit_position) & 1n;
+                        
+                        const drawX = x * PIXEL_SCALE;
+                        const drawY = (GRID_HEIGHT - 1 - y) * PIXEL_SCALE;
+
                         if (bit === 1n) {
-                            ctx.fillRect(x, (GRID_HEIGHT - 1 - y), 1, 1);
+                            ctx.fillStyle = ON_PIXEL_COLOR;
+                            ctx.fillRect(drawX, drawY, PIXEL_SCALE, PIXEL_SCALE);
                         }
+                        
+                        ctx.strokeRect(drawX, drawY, PIXEL_SCALE, PIXEL_SCALE);
                     }
                 }
             }
@@ -389,20 +409,21 @@
 
             function updateK(newK) {
                 textarea.value = newK.toString();
-                currentK = newK; // Keep cache in sync
+                currentK = newK; 
             }
 
             // --- Mode Switching Functions ---
 
-            /** Stops the main UFO animation */
             function stopUFOAnimation() {
                 if (ufoAnimationInterval) {
                     clearInterval(ufoAnimationInterval);
                     ufoAnimationInterval = null;
                 }
+                btnToggleUFOAnim.textContent = "Play UFO Animation";
+                btnToggleUFOAnim.classList.remove('bg-red-500', 'hover:bg-red-600');
+                btnToggleUFOAnim.classList.add('bg-blue-600', 'hover:bg-blue-700');
             }
 
-            /** Stops the manual hold-to-animate feature */
             function stopManualAnimation() {
                 if (isManualAnimationLatched) {
                     return; 
@@ -417,7 +438,6 @@
                 }
             }
 
-            /** Forcibly stops any manual animation and resets latch state */
             function forceStopManualAnimation() {
                 if (manualAnimationInterval) {
                     clearInterval(manualAnimationInterval);
@@ -428,16 +448,14 @@
                     manualAnimationTimer = null;
                 }
                 isManualAnimationLatched = false;
-                btnStopManualAnim.classList.add('hidden'); // Hide the stop button
+                btnStopManualAnim.classList.add('hidden'); 
             }
 
-            /** Stops ALL running animations */
             function stopAllAnimations() {
                 stopUFOAnimation();
                 forceStopManualAnimation();
             }
 
-            /** Starts the UFO animation */
             function playUFOAnimation() {
                 let tempK = UFO_TOP_LEFT_K; 
                 updateK(tempK);
@@ -448,9 +466,12 @@
                     updateK(tempK);
                     drawGrid(tempK);
                 }, 300); 
+
+                btnToggleUFOAnim.textContent = "Stop Animation";
+                btnToggleUFOAnim.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                btnToggleUFOAnim.classList.add('bg-red-500', 'hover:bg-red-600');
             }
 
-            /** Updates the UI to show the correct panel for the selected tab */
             function showPanel(panelToShow, tabToActivate) {
                 stopAllAnimations();
                 
@@ -460,7 +481,6 @@
                 panelToShow.classList.remove('hidden');
                 tabToActivate.setAttribute('aria-selected', 'true');
 
-                // NEW: Automatically manage draw mode based on tab
                 if (tabToActivate === btnDrawTab) {
                     canvas.classList.add('draw-mode-active');
                 } else {
@@ -468,35 +488,25 @@
                 }
             }
 
-            /** Loads the Tetris demo */
             function loadTetrisDemo() {
-                showPanel(tetrisPanel, btnTetrisTab);
-                currentTetrisPieceK = KS_BIGINT; // Reset piece to original ks
+                stopAllAnimations();
+                currentTetrisPieceK = KS_BIGINT; 
                 const totalK = KR_BIGINT + currentTetrisPieceK;
                 updateK(totalK);
                 drawGrid(totalK);
             }
             
-            /** Loads the Draw demo */
             function loadDrawMode() {
                 showPanel(drawPanel, btnDrawTab);
-                // Don't clear the canvas, let the user edit what's there
-                // Or maybe we should clear it? Let's clear it to 0n for a clean slate.
-                updateK(0n);
-                drawGrid(0n);
+                const k = getCurrentK();
+                updateK(k || 0n);
+                drawGrid(k || 0n);
             }
 
-            /** Loads the static/manual demo with a given K */
             function loadManualMode(k_value) {
-                showPanel(manualPanel, btnManualTab);
+                showPanel(transformPanel, btnTransformTab);
                 updateK(k_value);
                 drawGrid(k_value);
-            }
-
-            /** Shows the animation panel and starts the animation */
-            function showAnimationMode() {
-                showPanel(animationPanel, btnAnimTab);
-                playUFOAnimation();
             }
             
             // --- Modal Event Listeners ---
@@ -507,22 +517,16 @@
             });
 
             // --- Primary Mode Tab Button Listeners ---
-            btnAnimTab.addEventListener('click', showAnimationMode);
-            btnTetrisTab.addEventListener('click', loadTetrisDemo);
-            btnDrawTab.addEventListener('click', () => { // NEW
-                const k = getCurrentK();
-                showPanel(drawPanel, btnDrawTab);
-                // Keep the k-value from the previous tab
-                updateK(k || 0n);
-                drawGrid(k || 0n);
-            });
-            btnManualTab.addEventListener('click', () => {
+            btnTransformTab.addEventListener('click', () => {
                 const k = getCurrentK();
                 loadManualMode(k || UFO_CENTER_K);
             });
-            btnStopAnim.addEventListener('click', () => {
+            btnDrawTab.addEventListener('click', () => {
                 const k = getCurrentK();
-                loadManualMode(k);
+                loadDrawMode(); 
+            });
+            btnExamplesTab.addEventListener('click', () => {
+                showPanel(examplesPanel, btnExamplesTab);
             });
 
 
@@ -530,8 +534,18 @@
             btnLoadTupper.addEventListener('click', () => loadManualMode(TUPPER_K));
             btnLoadUFOCenter.addEventListener('click', () => loadManualMode(UFO_CENTER_K));
 
+            // --- Examples Panel Listeners ---
+            btnToggleUFOAnim.addEventListener('click', () => {
+                if (ufoAnimationInterval) {
+                    stopUFOAnimation();
+                } else {
+                    stopAllAnimations(); 
+                    playUFOAnimation();
+                }
+            });
 
-            // --- Tetris Control Listeners (for k = kr + ks') ---
+            btnLoadTetris.addEventListener('click', loadTetrisDemo);
+            
             btnTetrisMoveLeft.addEventListener('click', () => {
                 currentTetrisPieceK = currentTetrisPieceK / (2n ** H_BIGINT);
                 const totalK = KR_BIGINT + currentTetrisPieceK;
@@ -551,7 +565,7 @@
                 drawGrid(totalK);
             });
             
-            // --- NEW: Draw Mode Listeners ---
+            // --- Draw Mode Listeners ---
             btnClearCanvas.addEventListener('click', () => {
                 updateK(0n);
                 drawGrid(0n);
@@ -559,13 +573,9 @@
 
             // --- Manual Control Event Listeners (for k' = transform(k)) ---
 
-            /**
-             * Helper function to start a manual animation loop
-             * @param {function(bigint): bigint} transformFunction - A function that takes a k and returns a new k
-             */
             function startManualAnimation(transformFunction) {
-                stopAllAnimations(); // Stop any other animation
-                isManualAnimationLatched = false; // Reset latch
+                stopAllAnimations(); 
+                isManualAnimationLatched = false; 
                 
                 let k = getCurrentK();
                 if (!k) return;
@@ -582,7 +592,7 @@
                 
                 manualAnimationTimer = setTimeout(() => {
                     isManualAnimationLatched = true;
-                    btnStopManualAnim.classList.remove('hidden'); // Show the stop button
+                    btnStopManualAnim.classList.remove('hidden'); 
                 }, LATCH_TIME);
             }
 
@@ -590,7 +600,7 @@
             const transformDown = (k) => k / 2n;
             const transformLeft = (k) => k / (2n ** H_BIGINT);
             const transformRight = (k) => k * (2n ** H_BIGINT);
-            const transformDiag = (k) => (k * (2n ** H_BIGINT)) * 2n; // Up-Right
+            const transformDiag = (k) => (k * (2n ** H_BIGINT)) * 2n; 
 
             const stopEvents = ['mouseup', 'mouseleave', 'touchend'];
             
@@ -620,19 +630,13 @@
 
             // --- Draw Mode Canvas Listeners ---
 
-            /**
-             * Toggles a pixel on the canvas based on a mouse/touch event.
-             * This is the reverse of your formula: it finds i from (x,y) and toggles the bit.
-             */
             function handleDraw(event) {
-                // Check if the draw tab is active
                 if (btnDrawTab.getAttribute('aria-selected') !== 'true') return;
 
                 const rect = canvas.getBoundingClientRect();
                 const scaleX = canvas.width / rect.width;
                 const scaleY = canvas.height / rect.height;
 
-                // Get coordinates relative to the canvas
                 let clientX, clientY;
                 if (event.touches) {
                     clientX = event.touches[0].clientX;
@@ -645,39 +649,30 @@
                 const x_canvas = (clientX - rect.left) * scaleX;
                 const y_canvas = (clientY - rect.top) * scaleY;
 
-                // Get grid coordinates (0-105, 0-16)
-                const x = Math.floor(x_canvas);
-                const y_canvas_top_down = Math.floor(y_canvas);
+                const x = Math.floor(x_canvas / PIXEL_SCALE);
+                const y_canvas_top_down = Math.floor(y_canvas / PIXEL_SCALE);
                 
-                // Flip y-coordinate to match your paper's bottom-up formula
                 const y = (GRID_HEIGHT - 1) - y_canvas_top_down;
 
                 if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) {
-                    return; // Out of bounds
+                    return; 
                 }
 
                 const pixelKey = `${x},${y}`;
                 if (isDrawing && drawnPixels.has(pixelKey)) {
-                    return; // Already toggled this pixel in this drag
+                    return; 
                 }
                 drawnPixels.add(pixelKey);
 
-                // This is the (i-1) bit position from your formula
                 const bit_position = BigInt(x * GRID_HEIGHT + y);
-                
-                // Find the value to add/subtract
                 const value_to_change = H_BIGINT * (2n ** bit_position);
-
-                // Check if the bit is currently 1 or 0
                 const k_div_17 = currentK / H_BIGINT;
                 const bit = (k_div_17 >> bit_position) & 1n;
 
                 let newK;
                 if (bit === 1n) {
-                    // Pixel is ON, so turn it OFF (subtract)
                     newK = currentK - value_to_change;
                 } else {
-                    // Pixel is OFF, so turn it ON (add)
                     newK = currentK + value_to_change;
                 }
 
@@ -706,7 +701,6 @@
                 drawnPixels.clear();
             }
 
-            // Wire up all draw events
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
@@ -718,8 +712,8 @@
             canvas.addEventListener('touchcancel', stopDrawing);
 
             // --- Initial Load ---
-            // Automatically select the Animation tab and play the UFO animation on page load
-            showAnimationMode();
+            // Start on the "Transform & Load" tab with the UFO Center loaded.
+            loadManualMode(UFO_CENTER_K);
         });
     </script>
 
