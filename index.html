@@ -16,6 +16,11 @@
             aspect-ratio: 106 / 17;
             background-color: #f0f0f0;
         }
+        /* Style canvas when draw mode is active */
+        canvas.draw-mode-active {
+            cursor: crosshair;
+        }
+
         /* Simple syntax highlighting for the BibTeX block */
         pre[class*="language-"] {
             padding: 1em;
@@ -54,6 +59,26 @@
         /* Add user-select-none to prevent text highlighting when rapidly clicking/holding buttons */
         .manual-anim-button {
             @apply select-none;
+        }
+        
+        /* Custom Toggle Switch */
+        .toggle-switch {
+            @apply relative inline-flex items-center cursor-pointer;
+        }
+        .toggle-input {
+            @apply sr-only;
+        }
+        .toggle-label {
+            @apply block w-14 h-8 bg-gray-300 rounded-full transition-colors;
+        }
+        .toggle-input:checked + .toggle-label {
+            @apply bg-blue-600;
+        }
+        .toggle-input:checked + .toggle-label::after {
+            @apply translate-x-6;
+        }
+        .toggle-label::after {
+            @apply content-[''] absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform;
         }
 
     </style>
@@ -145,22 +170,25 @@
                                     <button id="btnMoveLeft" class="manual-anim-button bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Move Left</button>
                                     <button id="btnMoveRight" class="manual-anim-button bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Move Right</button>
                                     <button id="btnMoveDiagUpRight" class="manual-anim-button col-span-2 bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Move Diag (Up-Right)</button>
-                                    <!-- NEW: Stop button for latched animation -->
                                     <button id="btnStopManualAnim" class="col-span-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600 transition-colors hidden">Stop Manual Animation</button>
                                 </div>
                             </div>
-                            <!-- Pixel Operation -->
+                            
+                            <!-- NEW: Draw on Canvas Panel -->
                             <div class="bg-white rounded-lg p-4 border border-gray-200">
-                                <h3 class="text-md font-semibold text-gray-800 mb-4 text-center">Pixel Operation (Click)</h3>
-                                <div>
-                                    <label for="pixel_i" class="block text-sm font-medium text-gray-700">Pixel index (i):</label>
-                                    <input type="number" id="pixel_i" value="1" min="1" max="1802" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <h3 class="text-md font-semibold text-gray-800 mb-4 text-center">Draw on Canvas</h3>
+                                <div class="flex items-center justify-center space-x-3 mb-3">
+                                    <span class="text-gray-700 font-medium">Draw Mode:</span>
+                                    <label for="drawModeToggle" class="toggle-switch">
+                                        <input type="checkbox" id="drawModeToggle" class="toggle-input">
+                                        <span class="toggle-label"></span>
+                                    </label>
                                 </div>
-                                <div class="grid grid-cols-2 gap-3 mt-3">
-                                    <button id="btnAddPixel" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">Add (i)</button>
-                                    <button id="btnRemovePixel" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600 transition-colors">Remove (i)</button>
-                                </div>
+                                <p class="text-xs text-gray-500 text-center">
+                                    Turn on to click or drag on the canvas to toggle pixels and update the K-Value.
+                                </p>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -310,12 +338,10 @@
             const btnMoveDiagUpRight = document.getElementById('btnMoveDiagUpRight');
             const manualAnimButtons = [btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnMoveDiagUpRight];
             
-            // NEW: Manual Stop Button
             const btnStopManualAnim = document.getElementById('btnStopManualAnim');
 
-            const inputPixelI = document.getElementById('pixel_i');
-            const btnAddPixel = document.getElementById('btnAddPixel');
-            const btnRemovePixel = document.getElementById('btnRemovePixel');
+            // --- NEW: Draw Mode Elements ---
+            const drawModeToggle = document.getElementById('drawModeToggle');
             
             // --- Constants from your paper ---
             const GRID_WIDTH = 106;
@@ -341,6 +367,11 @@
             let isManualAnimationLatched = false; // Latch flag
             let currentTetrisPieceK = 0n; // Holds the transformed 'ks'
 
+            // --- NEW: Draw Mode State ---
+            let isDrawing = false;
+            let drawnPixels = new Set(); // Prevents toggling the same pixel multiple times in one drag
+            let currentK = 0n; // Local cache of k for drawing
+
             /**
              * Core Drawing Function
              */
@@ -349,6 +380,7 @@
                     console.error("drawGrid requires a BigInt");
                     return;
                 }
+                currentK = k; // Update the local cache
                 ctx.fillStyle = OFF_PIXEL_COLOR;
                 ctx.fillRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
                 ctx.fillStyle = ON_PIXEL_COLOR;
@@ -379,6 +411,7 @@
 
             function updateK(newK) {
                 textarea.value = newK.toString();
+                currentK = newK; // Keep cache in sync
             }
 
             // --- Mode Switching Functions ---
@@ -393,13 +426,9 @@
 
             /** Stops the manual hold-to-animate feature */
             function stopManualAnimation() {
-                // If the animation has "latched", don't stop it on mouseup.
-                // Only the "Stop Manual Animation" button can stop it.
                 if (isManualAnimationLatched) {
                     return; 
                 }
-                
-                // If we release *before* the latch, clear both the interval and the latch timer.
                 if (manualAnimationInterval) {
                     clearInterval(manualAnimationInterval);
                     manualAnimationInterval = null;
@@ -432,15 +461,14 @@
 
             /** Starts the UFO animation */
             function playUFOAnimation() {
-                let currentK = UFO_TOP_LEFT_K; 
-                updateK(currentK);
-                drawGrid(currentK);
+                let tempK = UFO_TOP_LEFT_K; 
+                updateK(tempK);
+                drawGrid(tempK);
                 
                 ufoAnimationInterval = setInterval(() => {
-                    // k' = k * 2^(1*17)
-                    currentK = currentK * (2n ** H_BIGINT);
-                    updateK(currentK);
-                    drawGrid(currentK);
+                    tempK = tempK * (2n ** H_BIGINT);
+                    updateK(tempK);
+                    drawGrid(tempK);
                 }, 300); 
             }
 
@@ -488,14 +516,12 @@
             btnAnimTab.addEventListener('click', showAnimationMode);
             btnTetrisTab.addEventListener('click', loadTetrisDemo);
             btnManualTab.addEventListener('click', () => {
-                // Load manual mode, keeping the current k if possible, otherwise default
-                const currentK = getCurrentK();
-                loadManualMode(currentK || UFO_CENTER_K);
+                const k = getCurrentK();
+                loadManualMode(k || UFO_CENTER_K);
             });
             btnStopAnim.addEventListener('click', () => {
-                // Stop animation and switch to manual mode with the last K value
-                const currentK = getCurrentK();
-                loadManualMode(currentK);
+                const k = getCurrentK();
+                loadManualMode(k);
             });
 
 
@@ -506,21 +532,18 @@
 
             // --- Tetris Control Listeners (for k = kr + ks') ---
             btnTetrisMoveLeft.addEventListener('click', () => {
-                // k' = kr + (ks / 2^(1*17))
                 currentTetrisPieceK = currentTetrisPieceK / (2n ** H_BIGINT);
                 const totalK = KR_BIGINT + currentTetrisPieceK;
                 updateK(totalK);
                 drawGrid(totalK);
             });
             btnTetrisMoveRight.addEventListener('click', () => {
-                // k' = kr + (ks * 2^(1*17))
                 currentTetrisPieceK = currentTetrisPieceK * (2n ** H_BIGINT);
                 const totalK = KR_BIGINT + currentTetrisPieceK;
                 updateK(totalK);
                 drawGrid(totalK);
             });
             btnTetrisMoveDown.addEventListener('click', () => {
-                // k' = kr + (ks / 2^1)
                 currentTetrisPieceK = currentTetrisPieceK / 2n;
                 const totalK = KR_BIGINT + currentTetrisPieceK;
                 updateK(totalK);
@@ -530,7 +553,7 @@
             // --- Manual Control Event Listeners (for k' = transform(k)) ---
 
             /**
-             * NEW: Helper function to start a manual animation loop
+             * Helper function to start a manual animation loop
              * @param {function(bigint): bigint} transformFunction - A function that takes a k and returns a new k
              */
             function startManualAnimation(transformFunction) {
@@ -540,33 +563,28 @@
                 let k = getCurrentK();
                 if (!k) return;
 
-                // Apply the first transform immediately on mousedown
                 k = transformFunction(k);
                 updateK(k);
                 drawGrid(k);
 
-                // Start the loop for continuous holding
                 manualAnimationInterval = setInterval(() => {
-                    k = transformFunction(k); // Note: 'k' is closed over, so it updates
+                    k = transformFunction(k); 
                     updateK(k);
                     drawGrid(k);
                 }, ANIMATION_SPEED);
                 
-                // Start the timer to "latch" the animation
                 manualAnimationTimer = setTimeout(() => {
                     isManualAnimationLatched = true;
                     btnStopManualAnim.classList.remove('hidden'); // Show the stop button
-                }, LATCH_TIME); // 1-second hold to latch
+                }, LATCH_TIME);
             }
 
-            // Define the small transform functions
             const transformUp = (k) => k * 2n;
             const transformDown = (k) => k / 2n;
             const transformLeft = (k) => k / (2n ** H_BIGINT);
             const transformRight = (k) => k * (2n ** H_BIGINT);
             const transformDiag = (k) => (k * (2n ** H_BIGINT)) * 2n; // Up-Right
 
-            // Wire up all manual animation buttons
             const stopEvents = ['mouseup', 'mouseleave', 'touchend'];
             
             btnMoveUp.addEventListener('mousedown', () => startManualAnimation(transformUp));
@@ -584,51 +602,122 @@
             btnMoveDiagUpRight.addEventListener('mousedown', () => startManualAnimation(transformDiag));
             btnMoveDiagUpRight.addEventListener('touchstart', (e) => { e.preventDefault(); startManualAnimation(transformDiag); });
             
-            // Add stop listeners (for release *before* latch) to all of them
             manualAnimButtons.forEach(button => {
                 stopEvents.forEach(event => {
                     button.addEventListener(event, stopManualAnimation);
                 });
             });
 
-            // NEW: Add listener for the "hard stop" button
             btnStopManualAnim.addEventListener('click', forceStopManualAnimation);
 
+            // --- NEW: Draw Mode Listeners ---
 
-            // --- Manual Click Listeners (Pixel Ops) ---
-            // These are still single-click
-            btnAddPixel.addEventListener('click', () => {
-                stopAllAnimations(); // Stop any hold-to-animate
-                const k = getCurrentK();
-                let i;
-                try {
-                    i = BigInt(inputPixelI.value);
-                    if (i < 1n || i > 1802n) throw new Error("Index out of bounds");
-                } catch(e) {
-                    alert("Please enter a valid pixel index i (1-1802).");
-                    return;
+            drawModeToggle.addEventListener('change', () => {
+                if (drawModeToggle.checked) {
+                    canvas.classList.add('draw-mode-active');
+                    // When enabling draw mode, stop all other animations and ensure we're in manual mode.
+                    const k = getCurrentK();
+                    loadManualMode(k || 0n); // Load manual mode with current K, or 0 if empty
+                } else {
+                    canvas.classList.remove('draw-mode-active');
                 }
-                if (!k) return;
-                const newK = k + (H_BIGINT * (2n ** (i - 1n)));
+            });
+
+            /**
+             * Toggles a pixel on the canvas based on a mouse/touch event.
+             * This is the reverse of your formula: it finds i from (x,y) and toggles the bit.
+             */
+            function handleDraw(event) {
+                if (!drawModeToggle.checked) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+
+                // Get coordinates relative to the canvas
+                let clientX, clientY;
+                if (event.touches) {
+                    clientX = event.touches[0].clientX;
+                    clientY = event.touches[0].clientY;
+                } else {
+                    clientX = event.clientX;
+                    clientY = event.clientY;
+                }
+
+                const x_canvas = (clientX - rect.left) * scaleX;
+                const y_canvas = (clientY - rect.top) * scaleY;
+
+                // Get grid coordinates (0-105, 0-16)
+                const x = Math.floor(x_canvas);
+                const y_canvas_top_down = Math.floor(y_canvas);
+                
+                // Flip y-coordinate to match your paper's bottom-up formula
+                const y = (GRID_HEIGHT - 1) - y_canvas_top_down;
+
+                if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) {
+                    return; // Out of bounds
+                }
+
+                const pixelKey = `${x},${y}`;
+                if (isDrawing && drawnPixels.has(pixelKey)) {
+                    return; // Already toggled this pixel in this drag
+                }
+                drawnPixels.add(pixelKey);
+
+                // This is the (i-1) bit position from your formula
+                const bit_position = BigInt(x * GRID_HEIGHT + y);
+                
+                // Find the value to add/subtract
+                const value_to_change = H_BIGINT * (2n ** bit_position);
+
+                // Check if the bit is currently 1 or 0
+                const k_div_17 = currentK / H_BIGINT;
+                const bit = (k_div_17 >> bit_position) & 1n;
+
+                let newK;
+                if (bit === 1n) {
+                    // Pixel is ON, so turn it OFF (subtract)
+                    newK = currentK - value_to_change;
+                } else {
+                    // Pixel is OFF, so turn it ON (add)
+                    newK = currentK + value_to_change;
+                }
+
                 updateK(newK);
                 drawGrid(newK);
-            });
-            btnRemovePixel.addEventListener('click', () => {
-                stopAllAnimations(); // Stop any hold-to-animate
-                const k = getCurrentK();
-                let i;
-                try {
-                    i = BigInt(inputPixelI.value);
-                    if (i < 1n || i > 1802n) throw new Error("Index out of bounds");
-                } catch(e) {
-                    alert("Please enter a valid pixel index i (1-1802).");
-                    return;
-                }
-                if (!k) return;
-                const newK = k - (H_BIGINT * (2n ** (i - 1n)));
-                updateK(newK);
-                drawGrid(newK);
-            });
+            }
+
+            function startDrawing(event) {
+                if (!drawModeToggle.checked) return;
+                event.preventDefault();
+                isDrawing = true;
+                drawnPixels.clear();
+                handleDraw(event);
+            }
+
+            function draw(event) {
+                if (!drawModeToggle.checked || !isDrawing) return;
+                event.preventDefault();
+                handleDraw(event);
+            }
+
+            function stopDrawing(event) {
+                if (!drawModeToggle.checked) return;
+                event.preventDefault();
+                isDrawing = false;
+                drawnPixels.clear();
+            }
+
+            // Wire up all draw events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+            
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchcancel', stopDrawing);
 
             // --- Initial Load ---
             // Automatically select the Animation tab and play the UFO animation on page load
