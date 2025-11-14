@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TupperTransformer Demo (v6)</title>
+    <title>TupperTransformer Demo (v7)</title>
     <!-- Load Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- NEW: Add KaTeX for math rendering -->
+    <!-- Add KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-sNMFNtENDED8hK1MrGoGWCMOKbM/3pQ/c/H/ABiA/EcL+E/CCXX9jLTkLMvGWpBY" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoYJkEuMCPIfQ8wQdMSS/aEVMymDqw3yfwNqLgBw+UTfBrsg8oX5nDLs/d/Q+iN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-43gviWU0YVjaDtb/Gf1ESWGOBVYcSBNctfYlhtc28wFm/F2CARbL8NStsvKFUwYf" crossorigin="anonymous"></script>
@@ -87,9 +87,12 @@
             An interactive demo of my transformation algorithm -Prathamesh Deshmukh.
         </p>
 
-        <!-- "Read More" Button -->
+        <!-- "Read More" Button & Summary Link -->
         <div class="text-center mb-6">
             <button id="btnReadMore" class="text-blue-600 font-medium hover:underline focus:outline-none">Read more about this project</button>
+            <!-- NEW LINK to README -->
+            <span class="mx-2 text-gray-400">|</span>
+            <a href="https://github.com/prathameshnium/TupperTransformer/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-medium hover:underline focus:outline-none">Quick summary of the paper</a>
         </div>
 
         <div class="bg-gray-200 rounded-lg p-2 overflow-hidden">
@@ -241,16 +244,7 @@
 
             <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">Citation & Publication History</h3>
             
-            <div class="w-full my-6 rounded-lg overflow-hidden border border-gray-200 bg-gray-50" style="aspect-ratio: 568 / 351;">
-                <iframe 
-                    src="https://widgets.figshare.com/articles/6373046/embed?show_title=1" 
-                    width="100%" 
-                    height="100%" 
-                    allowfullscreen 
-                    frameborder="0"
-                    class="w-full h-full">
-                </iframe>
-            </div>
+            <!-- REMOVED iFrame -->
 
             <h4 class="text-lg font-semibold mt-6 mb-2 text-gray-800">BibTeX Citation (Recommended)</h4>
             <pre class="language-bibtex rounded-lg"><code>@article{Deshmukh2018,
@@ -269,6 +263,10 @@
                     <p class="text-sm text-gray-600">Deshmukh, P. (2018). <i>Transformation of the pixels in Tupper's self-referential formula</i>. Figshare. (DOI: 10.6084/m9.figshare.6373046)</p>
                     <p class="text-sm text-gray-600 mt-1"><strong>First Posted:</strong> June 08, 2018</p>
                     <a href="https://doi.org/10.6084/m9.figshare.6373046" target="_blank" rel="noopener noreferrer" class="text-blue-600 text-sm hover:underline break-all mt-1 block">https://doi.org/10.6084/m9.figshare.6373046</a>
+                    <!-- NEW: Full Article Link -->
+                    <a href="https://figshare.com/articles/preprint/Transformation_of_pixels_pdf/6373046/2?file=11711468" target="_blank" rel="noopener noreferrer" class="text-green-700 text-sm font-semibold hover:underline mt-2 block">
+                        &rarr; Access the full article here
+                    </a>
                 </div>
 
                 <div class="bg-gray-50 p-3 rounded-md border">
@@ -516,7 +514,7 @@
             // --- Modal Event Listeners ---
             btnReadMore.addEventListener('click', () => {
                 aboutModal.classList.remove('hidden');
-                // NEW: Render KaTeX when modal opens
+                // Render KaTeX when modal opens
                 if (window.renderMathInElement) {
                     renderMathInElement(aboutModal, {
                         delimiters: [
