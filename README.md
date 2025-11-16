@@ -14,9 +14,35 @@ This algorithm operates directly on the high-precision integer (k-value) used to
 
 ## Live Demonstration
 
-Check out the live, interactive demo to see this algorithm in action:
+Experience the algorithm in action with the new and improved interactive demo. The interface has been completely redesigned to be more intuitive and mobile-friendly.
 
-https://prathameshnium.github.io/TupperTransformer/
+**[Click here to open the live demo](https://prathameshnium.github.io/TupperTransformer/)**
+
+## About the New Demo
+
+The interactive demo brings these concepts to life with a simple, unified interface designed for both desktop and mobile use.
+
+The layout is organized into two main columns on larger screens:
+
+### Left Column (The Canvas & Workspace)
+This is your main area for interaction.
+- **The Plot:** The $106 \times 17$ grid where the formula is rendered. **You can draw freely on the plot** at any time by clicking and dragging to create your own patterns.
+- **Transform Controls:** A compact control box is located directly below the plot, allowing you to move the entire pattern up, down, left, right, or diagonally.
+- **K-Value:** The high-precision integer `k` is always visible below the controls. It updates in real-time as you draw or transform the image. You can also paste a `k` value directly into this box, and the plot will update automatically.
+
+### Right Column (Actions & Examples)
+All actions are organized into a simple, two-part accordion panel.
+- **1. Demos & Examples:**
+    - **Load Patterns:** Instantly load the classic "Tupper's" self-referential plot or a "UFO" pattern.
+    - **Animation Demo:** Watch the "Top-Left UFO" animation from the paper.
+    - **Interactive Tetris:** This special demo loads a Tetris scene. When active, the standard transform controls below the canvas are **replaced with special "Piece" controls** that only move the falling L-piece, demonstrating the concept of transforming individual pixel groups.
+    - **Library of Babel:** See the formula generate random patterns continuously.
+- **2. Draw Your Own:**
+    - **Enable/Disable Draw Mode:** Toggle the ability to draw on the canvas (it is on by default).
+- **Clear Canvas:** A prominent red button is always visible at the top of this column to let you easily start over.
+
+### Other Features
+- **Clickable Formula:** Click the main Tupper's formula at the top of the page to instantly load the self-referential plot.
 
 ## About the Paper (Algorithm Summary)
 
@@ -44,34 +70,6 @@ My research can do the following:
 -   Create a formula for any film or motion picture.
 
 In short, my research represents a mathematical form of the "Library of Babel" but for film and motion pictures.
-
-## About the Demo (Instructions)
-
-The interactive demo brings these concepts to life with a simple, tabbed interface.
-
-### 1. Transform & Load (Main Panel)
-
-This is the main editor. You can:
-
--   **Load Examples:** Load the classic "Tupper's" formula or the "UFO (Center)" image.
--   **Transform:** Use the "Full Transform" buttons (Up, Down, Left, Right, Diag) to modify the entire image.
--   **Animate:** Click and hold any transform button to create a temporary animation. If you hold for 1 second, the animation will "latch" and continue playing, allowing you to release the mouse. A "Stop" button will appear.
-
-### 2. Draw
-
-This panel demonstrates the reverse of the formula:
-
--   Click or drag on the canvas grid to toggle pixels on or off.
--   The K-Value in the text box will update in real-time, showing you the exact integer that represents your drawing.
--   Use "Clear Canvas" to set k to 0.
-
-### 3. Demos & Examples
-
-This tab showcases the two major examples from the paper:
-
-Animation Demo (Eg3.1): Click "Play UFO Animation" to see the "Top-Left UFO" from the paper animated using the $k^{n}= k\times2^{n\times17}$ formula.
-
-Interactive Tetris (Eg3.2): Click "Load Tetris Example" to load the scene. The "Piece" buttons will only move the "L-piece" (ks) while leaving the resting pieces (kr) untouched, demonstrating the "Different transformation on the individual Pixar" concept.
 
 ## Citation
 
@@ -132,11 +130,14 @@ The repository is organized as follows:
 ```
 
 -   `paper/`: Contains the original 2018 preprint that this project is based on.
--   `index.html`, `style.css`, `script.js`: The core files for the interactive web demo.
+-   `index.html`: The core file for the interactive web demo, containing all HTML, CSS, and JavaScript.
 -   `CITATION.md`: Provides detailed citation information for academic use.
 -   `License`: The MIT license for the project.
 -   `README.md`: This documentation file.
 
+## Future Work
+
+I will be creating some more advanced features as I get free time. This includes exploring more complex transformations and further optimizing the rendering process.
 
 ## Contributing
 
