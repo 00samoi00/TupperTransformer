@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TupperTransformer Demo (v7)</title>
+    <title>TupperTransformer: An Interactive Demo of Tupper's Self-Referential Formula</title>
     <!-- Load Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -79,6 +79,16 @@
             @apply select-none;
         }
 
+        #tupper-formula {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            padding: 0.5rem;
+        }
+        #tupper-formula:hover {
+            background-color: #f0f0f0;
+            border-radius: 0.5rem;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8 flex items-center justify-center font-sans">
@@ -94,7 +104,7 @@
         
         <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">TupperTransformer</h1>
         <p class="text-center text-gray-600 mb-6">
-            An interactive demo of my Tupper's function transformation algorithm (<a href="https://figshare.com/articles/preprint/Transformation_of_pixels_pdf/6373046/2?file=11711468" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">pre-print @ 2018</a>), -Prathamesh Deshmukh.
+            An interactive demo of my Tupper's function transformation algorithm (<a href="https://figshare.com/articles/preprint/Transformation_of_pixels_pdf/6373046/2?file=11711468" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">pre-print from 2018</a>), -Prathamesh Deshmukh.
         </p>
         <div class="text-center text-gray-600 mb-6 text-lg" id="tupper-formula">
             $$ \frac{1}{2} < \left\lfloor \operatorname{mod}\left(\left\lfloor \frac{y}{17} \right\rfloor 2^{-17\lfloor x \rfloor - \operatorname{mod}(\lfloor y \rfloor, 17)}, 2\right) \right\rfloor $$
@@ -108,9 +118,9 @@
             <a href="https://github.com/prathameshnium/TupperTransformer/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-medium hover:underline focus:outline-none">Quick summary of the paper</a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
             <!-- Left Column -->
-            <div class="md:col-span-2">
+            <div class="lg:col-span-2">
                 <div class="bg-gray-200 rounded-lg p-2 overflow-hidden">
                     <canvas id="tupperCanvas" width="1060" height="170"></canvas>
                 </div>
@@ -118,15 +128,28 @@
                 <!-- Transform Controls -->
                 <div class="mt-6 p-4 border border-gray-200 bg-white rounded-lg">
                     <h3 class="text-md font-semibold text-gray-800 mb-4 text-center">Transform Pattern</h3>
-                    <p class="text-xs text-gray-500 text-center mb-3">Hold buttons to move the pattern on the canvas.</p>
-                                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                                <button id="btnMoveUp" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Up</button>
-                                                <button id="btnMoveDown" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Down</button>
-                                                <button id="btnMoveLeft" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Left</button>
-                                                <button id="btnMoveRight" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Right</button>
-                                                <button id="btnMoveDiagUpRight" class="manual-anim-button col-span-2 bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Diag (Up-Right)</button>
-                                                <button id="btnStopManualAnim" class="mt-2 w-full bg-red-500 text-white font-semibold py-1 px-3 rounded-md hover:bg-red-600 transition-colors hidden">Stop</button>
-                                            </div>                </div>
+                    <!-- Standard Controls -->
+                    <div id="standardTransformControls">
+                        <p class="text-xs text-gray-500 text-center mb-3">Hold buttons to move the pattern on the canvas.</p>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <button id="btnMoveUp" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Up</button>
+                            <button id="btnMoveDown" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Down</button>
+                            <button id="btnMoveLeft" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Left</button>
+                            <button id="btnMoveRight" class="manual-anim-button bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Right</button>
+                            <button id="btnMoveDiagUpRight" class="manual-anim-button col-span-2 bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Move Diag (Up-Right)</button>
+                            <button id="btnStopManualAnim" class="col-span-2 bg-red-500 text-white font-semibold py-1 px-3 rounded-md hover:bg-red-600 transition-colors hidden">Stop Manual Animation</button>
+                        </div>
+                    </div>
+                    <!-- Tetris Controls -->
+                    <div id="tetrisTransformControls" class="hidden">
+                        <p class="text-xs text-center text-orange-700 mb-3">Use these buttons to move the Tetris piece.</p>
+                         <div class="grid grid-cols-3 gap-2 mt-4 max-w-md mx-auto text-sm">
+                            <button id="btnTetrisMoveLeft" class="w-full bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Piece Left</button>
+                            <button id="btnTetrisMoveDown" class="w-full bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Piece Down</button>
+                            <button id="btnTetrisMoveRight" class="w-full bg-gray-700 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-800 transition-colors">Piece Right</button>
+                         </div>
+                    </div>
+                </div>
 
                 <!-- K-Value Input -->
                 <div class="mt-6">
@@ -135,8 +158,8 @@
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div class="md:col-span-1 space-y-6">
+            <!-- Right Column (Unified Controls) -->
+            <div class="lg:col-span-1 space-y-6">
                 <!-- Accordion Item 1: Demos & Examples -->
                 <div>
                     <h2 id="accordion-heading-1">
@@ -162,12 +185,7 @@
                              <div class="text-center mb-4">
                                  <button id="btnLoadTetris" class="w-full md:w-1/2 bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors shadow-sm">Load Tetris Example</button>
                              </div>
-                             <p class="text-orange-700 mb-4 text-sm text-center">After loading, use these buttons to transform the L-piece (ks) independently from the resting pieces (kr).</p>
-                             <div class="grid grid-cols-3 gap-3 mt-4 max-w-md mx-auto">
-                                <button id="btnTetrisMoveLeft" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Left</button>
-                                <button id="btnTetrisMoveDown" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Down</button>
-                                <button id="btnTetrisMoveRight" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors">Piece Right</button>
-                             </div>
+                             <p class="text-orange-700 mb-4 text-sm text-center">After loading, the transform controls below the canvas will change to Tetris-specific controls.</p>
                         </div>
                         <div class="p-4 border border-purple-200 bg-purple-50 rounded-lg text-center mt-6">
                              <h3 class="text-lg font-semibold text-purple-800 mb-4">Library of Babel</h3>
@@ -192,6 +210,33 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- References Section -->
+        <div class="mt-12 pt-8 border-t border-gray-200">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">References</h2>
+            <ul class="list-disc list-inside space-y-3 max-w-3xl mx-auto text-gray-700 text-center">
+                <li>
+                    <a href="https://www.petervis.com/mathematics/tuppers_self-referential_formula/tuppers_self-referential_formula.html" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                        Peter Vis: Tupper's Self-Referential Formula
+                    </a>
+                </li>
+                <li>
+                    <a href="http://tuppers-formula.tk" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                        Tupper's Formula Tools (tuppers-formula.tk)
+                    </a>
+                </li>
+                <li>
+                    <a href="https://youtu.be/_s5RFgd59ao" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                        The "Everything" Formula (YouTube by Numberphile)
+                    </a>
+                </li>
+                <li>
+                    <a href="http://campus.lakeforest.edu/trevino/Tupper_Paper.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                        Tupper's Original Paper (hosted by Lake Forest College)
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -324,6 +369,11 @@
             const btnReadMore = document.getElementById('btnReadMore');
             const aboutModal = document.getElementById('aboutModal');
             const btnCloseModal = document.getElementById('btnCloseModal');
+            const tupperFormula = document.getElementById('tupper-formula');
+
+            // --- Control Containers ---
+            const standardTransformControls = document.getElementById('standardTransformControls');
+            const tetrisTransformControls = document.getElementById('tetrisTransformControls');
 
             // --- Control Buttons ---
             const btnLoadTupper = document.getElementById('btnLoadTupper');
@@ -415,6 +465,18 @@
                 currentK = newK;
             }
 
+            // --- Debounce for manual input ---
+            let debounceTimer;
+            textarea.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const k = getCurrentK();
+                    if (k !== null) {
+                        drawGrid(k);
+                    }
+                }, 300);
+            });
+
             function stopAllAnimations() {
                 if (ufoAnimationInterval) clearInterval(ufoAnimationInterval);
                 ufoAnimationInterval = null;
@@ -423,6 +485,8 @@
                 btnToggleUFOAnim.textContent = "Play UFO Animation";
                 btnToggleBabel.textContent = "Start Library of Babel";
                 forceStopManualAnimation();
+                standardTransformControls.classList.remove('hidden');
+                tetrisTransformControls.classList.add('hidden');
             }
             
             // --- Modal ---
@@ -432,43 +496,52 @@
                 if (e.target === aboutModal) aboutModal.classList.add('hidden');
             });
 
+            tupperFormula.addEventListener('click', () => {
+                btnLoadTupper.click();
+            });
+
             // --- Control Logic ---
-            btnLoadTupper.addEventListener('click', () => {
-                stopAllAnimations();
-                updateK(TUPPER_K);
-                drawGrid(TUPPER_K);
-            });
-            btnLoadUFOCenter.addEventListener('click', () => {
-                stopAllAnimations();
-                updateK(UFO_CENTER_K);
-                drawGrid(UFO_CENTER_K);
-            });
-
-            // --- Draw Mode ---
-            function setDrawMode(enabled) {
-                isDrawing = false;
-                if (enabled) {
-                    canvas.classList.add('draw-mode-active');
-                    btnEnableDraw.textContent = 'Disable Draw Mode';
-                    btnEnableDraw.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    btnEnableDraw.classList.add('bg-red-500', 'hover:bg-red-600');
-                } else {
-                    canvas.classList.remove('draw-mode-active');
-                    btnEnableDraw.textContent = 'Enable Draw Mode';
-                    btnEnableDraw.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    btnEnableDraw.classList.add('bg-green-600', 'hover:bg-green-700');
-                }
-            }
-            btnEnableDraw.addEventListener('click', () => {
-                const isDrawActive = canvas.classList.contains('draw-mode-active');
-                setDrawMode(!isDrawActive);
-            });
-            btnClearCanvas.addEventListener('click', () => {
-                stopAllAnimations();
-                updateK(0n);
-                drawGrid(0n);
-            });
-
+                        btnLoadTupper.addEventListener('click', () => {
+                            stopAllAnimations();
+                            standardTransformControls.classList.remove('hidden');
+                            tetrisTransformControls.classList.add('hidden');
+                            updateK(TUPPER_K);
+                            drawGrid(TUPPER_K);
+                        });
+                        btnLoadUFOCenter.addEventListener('click', () => {
+                            stopAllAnimations();
+                            standardTransformControls.classList.remove('hidden');
+                            tetrisTransformControls.classList.add('hidden');
+                            updateK(UFO_CENTER_K);
+                            drawGrid(UFO_CENTER_K);
+                        });
+            
+                        // --- Draw Mode ---
+                        function setDrawMode(enabled) {
+                            isDrawing = false;
+                            if (enabled) {
+                                canvas.classList.add('draw-mode-active');
+                                btnEnableDraw.textContent = 'Disable Draw Mode';
+                                btnEnableDraw.classList.remove('bg-green-600', 'hover:bg-green-700');
+                                btnEnableDraw.classList.add('bg-red-500', 'hover:bg-red-600');
+                            } else {
+                                canvas.classList.remove('draw-mode-active');
+                                btnEnableDraw.textContent = 'Enable Draw Mode';
+                                btnEnableDraw.classList.remove('bg-red-500', 'hover:bg-red-600');
+                                btnEnableDraw.classList.add('bg-green-600', 'hover:bg-green-700');
+                            }
+                        }
+                        btnEnableDraw.addEventListener('click', () => {
+                            const isDrawActive = canvas.classList.contains('draw-mode-active');
+                            setDrawMode(!isDrawActive);
+                        });
+                        btnClearCanvas.addEventListener('click', () => {
+                            stopAllAnimations();
+                            standardTransformControls.classList.remove('hidden');
+                            tetrisTransformControls.classList.add('hidden');
+                            updateK(0n);
+                            drawGrid(0n);
+                        });
             // --- Demos ---
             btnToggleUFOAnim.addEventListener('click', () => {
                 if (ufoAnimationInterval) {
@@ -488,6 +561,8 @@
             });
             btnLoadTetris.addEventListener('click', () => {
                 stopAllAnimations();
+                standardTransformControls.classList.add('hidden');
+                tetrisTransformControls.classList.remove('hidden');
                 currentTetrisPieceK = KS_BIGINT;
                 const totalK = KR_BIGINT + currentTetrisPieceK;
                 updateK(totalK);
